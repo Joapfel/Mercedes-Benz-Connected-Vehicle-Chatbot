@@ -42,7 +42,7 @@ class MercedesResponseHandler:
                 res = mercedes.get_state_of_charge(vehicle_id)
                 vehicle_part = 'charge'
 
-        return res, vehicle_part
+        return res, vehicle_part, user_result
 
     @classmethod
     def json_command_response_readable(cls, vehicle_part, res, command):
@@ -59,7 +59,6 @@ class MercedesResponseHandler:
                 readable = 'Sorry, the command could not be executed. Please try again.'
 
         return readable
-
 
     @classmethod
     def json_information_response_readable(cls, res, vehicle_part):
