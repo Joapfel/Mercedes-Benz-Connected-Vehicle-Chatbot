@@ -27,10 +27,8 @@ The information requests are specified as generic as possible on Houndify, there
 
 should work for tires, doors, fuel, etc.
 
-More specific requests are possible for the doors and the location:
-- "Are my doors open?"
-- "Are my doors locked"
-- "Where is my car?"
+For locking the doors try:
+- "please tell Mercedes to lock my car"
 
 ## Implementation approach
 From a technical perspective five steps had to be done:
