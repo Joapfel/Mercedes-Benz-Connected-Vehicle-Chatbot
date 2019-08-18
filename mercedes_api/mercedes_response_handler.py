@@ -1,9 +1,11 @@
 import jmespath
+from loguru import logger
 
 
 class MercedesResponseHandler:
 
     @classmethod
+    @logger.catch
     def on_mercedes_indent(cls, car, mercedes, vehicle_id):
         keys = car.keys()
         vehicle_part = ''
@@ -45,6 +47,7 @@ class MercedesResponseHandler:
         return res, vehicle_part, user_result
 
     @classmethod
+    @logger.catch
     def json_command_response_readable(cls, vehicle_part, res, command):
 
         readable = 'Sorry, this request is not supported yet by the Mercedes-Benz API'
@@ -61,6 +64,7 @@ class MercedesResponseHandler:
         return readable
 
     @classmethod
+    @logger.catch
     def json_information_response_readable(cls, res, vehicle_part):
 
         readable = 'Sorry, this request is not supported yet by the Mercedes-Benz API'
