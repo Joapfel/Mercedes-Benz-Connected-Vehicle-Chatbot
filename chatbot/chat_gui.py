@@ -13,9 +13,17 @@ from loguru import logger
 
 
 class ChatGUI(QtWidgets.QMainWindow):
+    """
+    This class is responsible for the Graphical User Interface
+    of the mercedes chatbot.
+    It handles written requests when the user presses Enter
+    and it handles voice requests when the user presses on the button
+    with the microphone symbol.
+    """
 
     def __init__(self):
         super(ChatGUI, self).__init__()
+
         # load the static gui
         # and define the layout size
         self.ui = uic.loadUi('qt5chatgui.ui', self)
@@ -47,6 +55,14 @@ class ChatGUI(QtWidgets.QMainWindow):
         self.mercedes = MercedesApi(AUTH_TOKEN)
 
     def handle_houndify_response(self, res):
+        """
+        Handles the response json from Houndify.
+        First gives the general response from houndify to the user.
+        Secondly, if the request is a Mercedes connected vehicle usecase,
+        retrieves and shows a more specific answer to the request.
+        :param res: response json
+        :return:
+        """
         try:
             user_result = res['AllResults'][0]['WrittenResponseLong']
             self.last_chat_bubble = self.add_chat_bubble(text=user_result,
@@ -60,7 +76,7 @@ class ChatGUI(QtWidgets.QMainWindow):
                                                                  last_bubble=self.last_chat_bubble,
                                                                  role='bot')
             except:
-                pass
+                logger.warning(traceback.format_exc())
 
         try:
             intent = res['AllResults'][0]['Result']
@@ -77,6 +93,11 @@ class ChatGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_enter(self):
+        """
+        The slot / event handler if the user presses Enter within the text box.
+        Gets the user input (text) and passes it to Houndify.
+        :return:
+        """
         request = self.text_input.text()
         self.text_input.clear()
         self.last_chat_bubble = self.add_chat_bubble(text=request,
@@ -88,8 +109,13 @@ class ChatGUI(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_speech(self):
+        """
+        The slot / event handler if the user presses on the speech button
+        Streams the user input (audio) to Houndify.
+        :return:
+        """
         speech_client = StreamingHoundClient(CLIENT_ID, CLIENT_KEY, USER, REQUEST_INFO)
-        speech_client.start(SpeechListener(on_partial_transcript_func=self))
+        speech_client.start(SpeechListener(on_partial_transcript_func=self.text_input.setText))
 
         p = pyaudio.PyAudio()
         stream = p.open(format=FORMAT, channels=CHANNELS,
@@ -109,34 +135,54 @@ class ChatGUI(QtWidgets.QMainWindow):
         user_utterance = 'Sorry, your request was not recognized.'
         try:
             user_utterance = res['Disambiguation']['ChoiceData'][0]['Transcription']
-        except:
+        except KeyError:
             pass
         self.last_chat_bubble = self.add_chat_bubble(user_utterance, self.last_chat_bubble, role='user')
         self.handle_houndify_response(res)
 
     def add_chat_bubble(self, text, last_bubble, role='bot'):
+        """
+        Helper method for adding chat bubbles to the chat interface.
+        Uses information about the last added chat bubble (like size, position, design)
+        in order to create the new chat bubble.
+        Different styles for user and bot chat bubbles.
+        :param text: the chat bubbles content
+        :param last_bubble: the previously added chat bubble
+        :param role: bot OR user
+        :return: returns the newly created chat bubble
+        """
+        # information from the previous chat bubble
         last_rect = last_bubble.geometry()
         height = last_rect.height()
 
+        # create the new chat bubble (label)
         label = QtWidgets.QLabel(text)
         label.setFont(last_bubble.font())
-
         label.setAlignment(QtCore.Qt.AlignCenter)
         label.setStyleSheet(ROLE_DESIGN_MAPPING[role])
         label.setFixedSize(self._label_size(text), height)
 
+        # positioning based on the role
         new_x = 0
         if role == 'user':
             new_x = 8
         new_y = self.layout.indexOf(last_bubble) + 1
 
+        # add the label to the layout and scroll down
         self.layout.addWidget(label, new_y, new_x)
         label.show()
-
         self.scroll_area.ensureWidgetVisible(label)
+
         return label
 
     def add_chat_bubble_big_text(self, text):
+        """
+        Helper method specifically for the self defined Mercedes responses.
+        Some of the answers span over multiple lines, which is turned into
+        multiple short responses instead of a single big one.
+        :param text: the Mercedes response (already humand readable)
+        :return:
+        """
         # TODO: do I need os independent linebreaks?
         if '\n' in text:
             lines = text.split('\n')
@@ -146,6 +192,11 @@ class ChatGUI(QtWidgets.QMainWindow):
             self.last_chat_bubble = self.add_chat_bubble(text, self.last_chat_bubble, role='bot')
 
     def _label_size(self, text):
+        """
+        Defines chat bubble (label) size based on the amount of text in it.
+        :param text: the labels future text
+        :return: returns the labels target size
+        """
         text_length = len(text)
         if text_length < 5:
             return text_length * 25
