@@ -26,3 +26,10 @@ The information requests are specified as generic as possible on Houndify, there
 
 should work for tires, doors, fuel, etc.
 
+## Implementation approach
+From a technical perspective five steps had to be done:
+- employing the Houndify SDK/API (TextClient & AudioClient)
+- defining custom Mercedes-Benz Connected Car usecases on Houndify
+- building a python wrapper for the Mercedes-Benz Connected Car REST API and define how to present the vehicle specific usecases to the user
+- building the GUI with QT5 (QT5 Designer for the basic static layout and PyQt5 to add chat bubbles dynamically at runtime)
+- and of course putting everything together (includes debugging, logging, getting crazy here and there ;) )
