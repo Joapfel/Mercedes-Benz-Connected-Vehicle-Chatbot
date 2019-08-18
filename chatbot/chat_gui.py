@@ -10,6 +10,7 @@ import pyaudio
 from chatbot.settings import ROLE_DESIGN_MAPPING
 import traceback
 from loguru import logger
+import os
 
 
 class ChatGUI(QtWidgets.QMainWindow):
@@ -193,9 +194,8 @@ class ChatGUI(QtWidgets.QMainWindow):
         :param text: the Mercedes response (already humand readable)
         :return:
         """
-        # TODO: do I need os independent linebreaks?
-        if '\n' in text:
-            lines = text.split('\n')
+        if os.linesep in text:
+            lines = text.split(os.linesep)
             for line in lines:
                 self.last_chat_bubble = self.add_chat_bubble(line, self.last_chat_bubble, role='bot')
         else:
