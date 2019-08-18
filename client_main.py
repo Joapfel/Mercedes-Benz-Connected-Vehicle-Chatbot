@@ -4,7 +4,12 @@ from chatbot.chat_gui import ChatGUI
 from loguru import logger
 from datetime import datetime
 
+"""
+Here starts the program.
+"""
+
 logger.add(f'main-{datetime.strftime(datetime.now(), "%Y-%m-%d %H:%M:%S")}.log')
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
