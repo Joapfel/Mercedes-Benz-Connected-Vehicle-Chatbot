@@ -23,8 +23,14 @@ Mercedes-Benz specific usecases exploit the Connected Vehicle API, therefore the
 The information requests are specified as generic as possible on Houndify, therefore a sentence like
 - "What is the status of my < car-domain >" 
 - "Could you given me information about my < car-domain >"
+- "How are/is my < car-domain >"
 
 should work for tires, doors, fuel, etc.
+
+More specific requests are possible for the doors and the location:
+- "Are my doors open?"
+- "Are my doors locked"
+- "Where is my car?"
 
 ## Implementation approach
 From a technical perspective five steps had to be done:
