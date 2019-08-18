@@ -3,45 +3,59 @@ from loguru import logger
 
 
 class MercedesResponseHandler:
+    """
+    This class handles the requests and responses of self defined Mercedes connected vehicle usecases.
+    """
 
     @classmethod
     @logger.catch
-    def on_mercedes_indent(cls, car, mercedes, vehicle_id):
-        keys = car.keys()
+    def on_mercedes_indent(cls, car_json, mercedes_connection, vehicle_id):
+        """
+        Based on the Houndify response json decides which Mercedes API endpoint to use
+        for the request.
+        :param car_json: Houndify json
+        :param mercedes_connection: instance of the Mercedes API
+        :param vehicle_id: vehicle id of the target vehicle
+        :return: returns:
+                    1. the API response
+                    2. the vehicle part (tires, doors, etc) for further usage
+                    3. the potential user result (only if the request was a command)
+        """
+        keys = car_json.keys()
         vehicle_part = ''
         res = None
         user_result = None
         if 'tires' in keys:
-            if car['tires'] == 'information':
-                res = mercedes.get_tires_pressure(vehicle_id)
+            if car_json['tires'] == 'information':
+                res = mercedes_connection.get_tires_pressure(vehicle_id)
                 vehicle_part = 'tires'
 
         elif 'doors' in keys:
-            if car['doors'] == 'information':
-                res = mercedes.get_doors_status(vehicle_id)
+            if car_json['doors'] == 'information':
+                res = mercedes_connection.get_doors_status(vehicle_id)
                 vehicle_part = 'doors'
             else:
-                res = mercedes.set_doors_status(vehicle_id, car['doors'])
-                user_result = MercedesResponseHandler.json_command_response_readable('doors', res, car['doors'])
+                res = mercedes_connection.set_doors_status(vehicle_id, car_json['doors'])
+                user_result = MercedesResponseHandler.json_command_response_readable('doors', res, car_json['doors'])
 
         elif 'location' in keys:
-            if car['location'] == 'information':
-                res = mercedes.get_location(vehicle_id)
+            if car_json['location'] == 'information':
+                res = mercedes_connection.get_location(vehicle_id)
                 vehicle_part = 'location'
 
         elif 'odometer' in keys:
-            if car['odometer'] == 'information':
-                res = mercedes.get_odometer_information(vehicle_id)
+            if car_json['odometer'] == 'information':
+                res = mercedes_connection.get_odometer_information(vehicle_id)
                 vehicle_part = 'odometer'
 
         elif 'fuel' in keys:
-            if car['fuel'] == 'information':
-                res = mercedes.get_fuel_level(vehicle_id)
+            if car_json['fuel'] == 'information':
+                res = mercedes_connection.get_fuel_level(vehicle_id)
                 vehicle_part = 'fuel'
 
         elif 'charge' in keys:
-            if car['charge'] == 'information':
-                res = mercedes.get_state_of_charge(vehicle_id)
+            if car_json['charge'] == 'information':
+                res = mercedes_connection.get_state_of_charge(vehicle_id)
                 vehicle_part = 'charge'
 
         return res, vehicle_part, user_result
@@ -49,7 +63,13 @@ class MercedesResponseHandler:
     @classmethod
     @logger.catch
     def json_command_response_readable(cls, vehicle_part, res, command):
-
+        """
+        Creates a human readable response string from a command result.
+        :param vehicle_part: (tires, doors, etc)
+        :param res: Houndify json for commands
+        :param command: the kind of command
+        :return: returns the created response string
+        """
         readable = 'Sorry, this request is not supported yet by the Mercedes-Benz API'
         if vehicle_part == 'doors':
             status = jmespath.search('status', res)
@@ -66,7 +86,13 @@ class MercedesResponseHandler:
     @classmethod
     @logger.catch
     def json_information_response_readable(cls, res, vehicle_part):
-
+        """
+        Creates a human readable response string from the specific information
+        that was provided by the Mercedes API.
+        :param res: Mercedes API response json
+        :param vehicle_part: (tires, doors, etc)
+        :return: returns the created response string
+        """
         readable = 'Sorry, this request is not supported yet by the Mercedes-Benz API'
         if vehicle_part == 'tires':
             unit = jmespath.search('tirepressurefrontleft.unit', res)
@@ -102,13 +128,9 @@ class MercedesResponseHandler:
                        f'longitude: {lonitude}.'
 
         elif vehicle_part == 'odometer':
-            print(res)
             unit = jmespath.search('distancesincereset.unit', res)
             dist_since_reset = jmespath.search('distancesincereset.value', res)
             dist_since_start = jmespath.search('distancesincestart.value', res)
-            print(unit)
-            print(dist_since_reset)
-            print(dist_since_start)
             dist_total = jmespath.search('odometer.value', res)
             readable = f'You have driven {dist_since_start} {unit} since you started, \n' \
                        f'since the last reset you drove {dist_since_reset} {unit}, \n' \
