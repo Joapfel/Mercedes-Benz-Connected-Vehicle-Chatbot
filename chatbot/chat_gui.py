@@ -20,39 +20,49 @@ class ChatGUI(QtWidgets.QMainWindow):
     and it handles voice requests when the user presses on the button
     with the microphone symbol.
     """
+    __instance = None
+    __initialized = False
+
+    def __new__(cls):
+        if not ChatGUI.__instance:
+            ChatGUI.__instance = QtWidgets.QMainWindow.__new__(cls)
+        return ChatGUI.__instance
 
     def __init__(self):
-        super(ChatGUI, self).__init__()
+        if not self.__initialized:
+            super(ChatGUI, self).__init__()
 
-        # load the static gui
-        # and define the layout size
-        self.ui = uic.loadUi('qt5chatgui.ui', self)
-        self.scroll_area = self.findChild(QtWidgets.QScrollArea, 'scroll_area')
-        self.scroll_area_widget_contents = self.findChild(QtWidgets.QWidget, 'scroll_area_widget_contents')
-        self.layout = self.scroll_area_widget_contents.layout()
-        self.layout.setColumnStretch(0, 4)
-        self.layout.setColumnStretch(4, 8)
+            # load the static gui
+            # and define the layout size
+            self.ui = uic.loadUi('qt5chatgui.ui', self)
+            self.scroll_area = self.findChild(QtWidgets.QScrollArea, 'scroll_area')
+            self.scroll_area_widget_contents = self.findChild(QtWidgets.QWidget, 'scroll_area_widget_contents')
+            self.layout = self.scroll_area_widget_contents.layout()
+            self.layout.setColumnStretch(0, 4)
+            self.layout.setColumnStretch(4, 8)
 
-        # text input and speech button connected with their event handlers
-        self.text_input = self.findChild(QtWidgets.QLineEdit, 'text_input')
-        self.text_input.returnPressed.connect(self.on_enter)
-        self.speech_button = self.findChild(QtWidgets.QPushButton, 'speech_button')
-        self.speech_button.pressed.connect(self.on_speech)
+            # text input and speech button connected with their event handlers
+            self.text_input = self.findChild(QtWidgets.QLineEdit, 'text_input')
+            self.text_input.returnPressed.connect(self.on_enter)
+            self.speech_button = self.findChild(QtWidgets.QPushButton, 'speech_button')
+            self.speech_button.pressed.connect(self.on_speech)
 
-        # create initial chat bubble with a greeting
-        # gets overridden after every request
-        greeting = 'How can I help you?'
-        self.last_chat_bubble = QtWidgets.QLabel(greeting)
-        self.last_chat_bubble.setFont(QtGui.QFont('Ubuntu', 16))
-        self.last_chat_bubble.setAlignment(QtCore.Qt.AlignCenter)
-        self.last_chat_bubble.setStyleSheet(ROLE_DESIGN_MAPPING['bot'])
-        self.last_chat_bubble.setFixedSize(self._label_size(greeting), 51)
-        self.layout.addWidget(self.last_chat_bubble, 0, 0)
-        self.show()
+            # create initial chat bubble with a greeting
+            # gets overridden after every request
+            greeting = 'How can I help you?'
+            self.last_chat_bubble = QtWidgets.QLabel(greeting)
+            self.last_chat_bubble.setFont(QtGui.QFont('Ubuntu', 16))
+            self.last_chat_bubble.setAlignment(QtCore.Qt.AlignCenter)
+            self.last_chat_bubble.setStyleSheet(ROLE_DESIGN_MAPPING['bot'])
+            self.last_chat_bubble.setFixedSize(self._label_size(greeting), 51)
+            self.layout.addWidget(self.last_chat_bubble, 0, 0)
+            self.show()
 
-        # connections to houndify and mercedes apis
-        self.houndify_client = TextHoundClient(CLIENT_ID, CLIENT_KEY, USER, REQUEST_INFO)
-        self.mercedes = MercedesApi(AUTH_TOKEN)
+            # connections to houndify and mercedes apis
+            self.houndify_client = TextHoundClient(CLIENT_ID, CLIENT_KEY, USER, REQUEST_INFO)
+            self.mercedes = MercedesApi(AUTH_TOKEN)
+
+            self.__initialized = True
 
     def handle_houndify_response(self, res):
         """
@@ -115,7 +125,7 @@ class ChatGUI(QtWidgets.QMainWindow):
         :return:
         """
         speech_client = StreamingHoundClient(CLIENT_ID, CLIENT_KEY, USER, REQUEST_INFO)
-        speech_client.start(SpeechListener(on_partial_transcript_func=self.text_input.setText))
+        speech_client.start(SpeechListener())
 
         p = pyaudio.PyAudio()
         stream = p.open(format=FORMAT, channels=CHANNELS,
