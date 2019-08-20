@@ -1,3 +1,5 @@
+![Alt Text](https://github.com/Joapfel/Mercedes-Benz-Connected-Vehicle-Chatbot/tires.gif)
+
 # Mercedes-Benz Connected Vehicle Chatbot
 A Houndify based chatbot which supports self defined Mercedes-Benz usecases using the Connected Vehicle API.
 
