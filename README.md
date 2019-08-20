@@ -1,7 +1,7 @@
-![](https://github.com/Joapfel/Mercedes-Benz-Connected-Vehicle-Chatbot/blob/master/tires.gif)
-
 # Mercedes-Benz Connected Vehicle Chatbot
 A Houndify based chatbot which supports self defined Mercedes-Benz usecases using the Connected Vehicle API.
+
+![](https://github.com/Joapfel/Mercedes-Benz-Connected-Vehicle-Chatbot/blob/master/tires.gif)
 
 ## How to start the Application
 Run **python client_main.py**, the file is located in the top level directory.
