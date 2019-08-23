@@ -4,7 +4,7 @@ A Houndify based chatbot which supports self defined Mercedes-Benz usecases usin
 ![](https://github.com/Joapfel/Mercedes-Benz-Connected-Vehicle-Chatbot/blob/master/tires.gif)
 
 ## How to start the Application
-Run **python client_main.py**, the file is located in the top level directory.
+Run `python client_main.py`, the file is located in the top level directory.
 
 ## Usage
 The application should be self explanatory:
@@ -15,7 +15,7 @@ The application should be self explanatory:
 ## Dependencies
 - The application uses **pyaudio** which is based on **portAudio** (needs to be installed on the OS).
 - **QT5** should be installed such that it can be used by the **PyQt5** python package
-- for the other dependencies it should be sufficient to **pip install requirements.txt**
+- for the other dependencies it should be sufficient to `pip install requirements.txt`
 
 ## Usecases
 Mercedes-Benz specific usecases exploit the Connected Vehicle API, therefore the following car domains are supported:
