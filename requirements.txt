@@ -1,6 +1,6 @@
 PyQt5==5.13.0
 PyAudio==0.2.11
-loguru==0.3.2
+loguru==0.5.3
 geocoder==1.38.1
 requests==2.21.0
 jmespath==0.9.3
